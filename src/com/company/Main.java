@@ -1,6 +1,5 @@
 package com.company;
 
-import java.sql.SQLException;
 import com.company.Graph.Graph;
 
 import javax.swing.*;

@@ -35,7 +35,7 @@ public class Graph extends JFrame {
         this.setLocationRelativeTo(null);
         this.setTitle("Register to BD");
         this.pack();
-        registerBTN();      refreshBTN();       nullbdBTN();        consultBTN();   deleteBTN();
+        registerBTN();      refreshBTN();       nullbdBTN();        consultBTN();   deleteBTN();    modifyBTN();    searchBTN();
     }
 
     public void registerBTN(){
@@ -108,15 +108,15 @@ public class Graph extends JFrame {
                     ResultSet consult = select.executeQuery();
                     while(consult.next()){
                         information.append(consult.getString(1));
-                        information.append("                   ");
+                        information.append("        ");
                         information.append(consult.getString(2));
-                        information.append("                   ");
+                        information.append("        ");
                         information.append(consult.getString(3));
-                        information.append("                   ");
+                        information.append("        ");
                         information.append(consult.getString(4));
-                        information.append("                   ");
+                        information.append("        ");
                         information.append(consult.getString(5));
-                        information.append("                   ");
+                        information.append("        ");
                         information.append(consult.getString(6));
                         information.append("\n");
                     }
@@ -139,6 +139,59 @@ public class Graph extends JFrame {
                     delete.setString(1,txt_search.getText().trim());
                     delete.executeUpdate();
                     JOptionPane.showMessageDialog(null,"Record successfully removed");
+
+                    connectionDB.disconect();
+                }catch (Exception e){
+                    JOptionPane.showMessageDialog(null,"Error: " + e);
+                }
+            }
+        });
+    }
+
+    public void modifyBTN(){
+        btn_Modify.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                try {
+                    Connection connection = connectionDB.connect();
+
+                    String ID = txt_search.getText().trim();
+                    PreparedStatement modify = connection.prepareStatement("update employee set name = ?, surname = ?, phone= ?, email= ?, profession= ? where id= " + ID);
+                    modify.setString(1,txt_name.getText().trim());
+                    modify.setString(2,txt_surname.getText().trim());
+                    modify.setString(3,txt_phone.getText().trim());
+                    modify.setString(4,txt_email.getText().trim());
+                    modify.setString(5,combo_profession.getSelectedItem().toString());
+                    modify.executeUpdate();
+                    JOptionPane.showMessageDialog(null,"Registry Modified Successfully");
+
+                    connectionDB.disconect();
+                }catch (Exception e){
+                    JOptionPane.showMessageDialog(null,"Error: " + e);
+                }
+            }
+        });
+    }
+
+    public void searchBTN(){
+        btn_search.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                try {
+                    Connection connection = connectionDB.connect();
+
+                    PreparedStatement search = connection.prepareStatement("select * from employee where id = ?");
+                    search.setString(1,txt_search.getText().trim());
+                    ResultSet consult = search.executeQuery();
+                    while(consult.next()){
+                        txt_name.setText(consult.getString("name"));
+                        txt_surname.setText(consult.getString("surname"));
+                        txt_phone.setText(consult.getString("phone"));
+                        txt_email.setText(consult.getString("email"));
+                        combo_profession.setSelectedItem(consult.getString("profession"));
+                    }
+
+                    JOptionPane.showMessageDialog(null,"The data was found");
 
                     connectionDB.disconect();
                 }catch (Exception e){
